@@ -1,11 +1,11 @@
 from adafruit_servokit import ServoKit
+import board
+import busio
 
 import inputs
 import serial
 import asyncio
 
-import board
-import busio
 import time
 
 # Joystick MUST be "X" Mode!!
@@ -14,30 +14,16 @@ class JoySerialSenderTwoBytes(object):
     # 0 ~ 5 / 10 steps
     # 0, 0.5, 1.0, 1.5 ...
     joyDict = {
-        'ABS_X': 127,
-        'ABS_Y': 127,
-        'ABS_RX': 127,
-        'ABS_RY': 127,
-    }
-
-    prevjoyDict = {
-        'ABS_X': 127,
-        'ABS_Y': 127,
-        'ABS_RX': 127,
-        'ABS_RY': 127,
+        'ABS_X': 90,
+        'ABS_Y': 90,
+        'ABS_RX': 90,
+        'ABS_RY': 90,
     }
 
     btnDict = {
         'ABS_HAT0X': 0,
         'ABS_HAT0Y': 0,
     }
-
-    btnDictPrev = {
-        'ABS_HAT0X': 0,
-        'ABS_HAT0Y': 0,
-    }
-
-    STEP = 10
 
     def __init__(self):
         super().__init__()
@@ -57,43 +43,25 @@ class JoySerialSenderTwoBytes(object):
         self.msg_header = bytes([255, 1])
         self._loop = asyncio.get_event_loop()
 
-    def rotateServo(self, i, angle):
-        self._kit.servo[i].angle = angle
+    def rotateServo(self):
+        print(self.joyDict)
+        
+        self._kit.servo[0].angle = self.joyDict['ABS_Y']
+        self._kit.servo[1].angle = self.joyDict['ABS_X']
 
     def joyLoop(self):
         events = inputs.get_gamepad()
         for event in events:
+            if event.code == "ABS_Y" or event.code == "ABS_RY":
+                event.state = int((event.state * -1 + 32767) / (32767 + 32768) * 180)
+            else:
+                event.state = int((event.state + 32767) / (32767 + 32768) * 180)
+
             if (event.code in self.joyDict) or (event.code in self.btnDict):
-                if event.code == "ABS_Y" or event.code == "ABS_RY":
-                    event.state = - event.state + 255 - 1
-                elif event.code in self.btnDict:
-                    if event.state != 0:
-                        if event.code == "ABS_HAT0Y":
-                            self.btnDict[event.code] -= event.state * 5
-                        elif event.code == "ABS_HAT0X":
-                            self.btnDict[event.code] += event.state * 5 
-                        if self.btnDict[event.code] < 0:
-                            self.btnDict[event.code] = 0
-                        if self.btnDict[event.code] > 200:
-                            self.btnDict[event.code] = 200
-
-                    print(self.btnDict)
-                    continue
-
-                event.state = min(int((event.state + 32768) / 256), 254) 
-
-                if abs(self.prevjoyDict[event.code] - event.state) > self.STEP:
-                    self.joyDict[event.code] = event.state
-                    self.prevjoyDict[event.code] = event.state
-
-                else:
-                    continue
-                
-            elif event.code == 'BTN_NORTH':
-                for key in self.joyDict.keys():
-                    self.joyDict[key] = 128
-                self.btnDict["ABS_HAT0X"] = 0
-                self.btnDict["ABS_HAT0Y"] = 0
+                self.joyDict[event.code] = event.state
+            print(self.joyDict)
+        
+        self.rotateServo()
 
     async def joyLoopExecutor(self):
         while True:

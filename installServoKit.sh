@@ -5,7 +5,10 @@ set -e
 sudo ./scripts/setPermissions.sh $USER
 # Then install servokit
 sudo apt-get install python3-pip -y
+
 sudo -H pip3 install adafruit-circuitpython-servokit
+sudo -H pip3 install pip install pyserial
+sudo -H pip3 install pip install asyncio
 echo ""
 echo "Adafruit CircuitPython ServoKit installed."
 echo "Please logoff/logon or reboot in order for I2C permissions to take effect."
