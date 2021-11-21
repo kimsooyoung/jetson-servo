@@ -15,14 +15,14 @@ class JoySerialSenderTwoBytes(object):
     # 0, 0.5, 1.0, 1.5 ...
     joyDict = {
         'ABS_X': 90,
-        'ABS_Y': 90,
+        'ABS_Y': 120,
         'ABS_RX': 90,
         'ABS_RY': 90,
     }
 
     servoRange = {
         'ABS_X' : (0, 180),
-        'ABS_Y' : (0, 180),
+        'ABS_Y' : (120, 180),
         'ABS_RX': (0, 180),
         'ABS_RY': (0, 180),
     }
@@ -63,10 +63,10 @@ class JoySerialSenderTwoBytes(object):
         for event in events:
             if event.code == "ABS_Y" or event.code == "ABS_RY":
                 servoRange = self.servoRange[event.code]
-                event.state = int((event.state * -1 + 32767) / (32767 + 32768) * (servoRange[1] - servoRange[0]))
+                event.state = int((event.state * -1 + 32767) / (32767 + 32768) * (servoRange[1] - servoRange[0])) + servoRange[0]
             elif event.code == "ABS_X" or event.code == "ABS_RX":
                 servoRange = self.servoRange[event.code]
-                event.state = int((event.state + 32767) / (32767 + 32768) * (servoRange[1] - servoRange[0]))
+                event.state = int((event.state + 32767) / (32767 + 32768) * (servoRange[1] - servoRange[0])) + servoRange[0]
 
             if (event.code in self.joyDict) or (event.code in self.btnDict):
                 self.joyDict[event.code] = event.state

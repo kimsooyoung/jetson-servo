@@ -26,6 +26,8 @@ def setup():
 def run():
     global kit
 
+    print("start")
+
     sweep = range(0,180)
     for degree in sweep:
         kit.servo[0].angle=degree
