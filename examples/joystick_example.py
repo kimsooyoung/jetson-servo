@@ -20,6 +20,13 @@ class JoySerialSenderTwoBytes(object):
         'ABS_RY': 90,
     }
 
+    servoRange = {
+        'ABS_X' : (0, 180),
+        'ABS_Y' : (0, 180),
+        'ABS_RX': (0, 180),
+        'ABS_RY': (0, 180),
+    }
+
     btnDict = {
         'ABS_HAT0X': 0,
         'ABS_HAT0Y': 0,
@@ -55,9 +62,11 @@ class JoySerialSenderTwoBytes(object):
         events = inputs.get_gamepad()
         for event in events:
             if event.code == "ABS_Y" or event.code == "ABS_RY":
-                event.state = int((event.state * -1 + 32767) / (32767 + 32768) * 180)
+                servoRange = self.servoRange[event.code]
+                event.state = int((event.state * -1 + 32767) / (32767 + 32768) * (servoRange[1] - servoRange[0]))
             else:
-                event.state = int((event.state + 32767) / (32767 + 32768) * 180)
+                servoRange = self.servoRange[event.code]
+                event.state = int((event.state + 32767) / (32767 + 32768) * (servoRange[1] - servoRange[0]))
 
             if (event.code in self.joyDict) or (event.code in self.btnDict):
                 self.joyDict[event.code] = event.state
