@@ -64,7 +64,7 @@ class JoySerialSenderTwoBytes(object):
             if event.code == "ABS_Y" or event.code == "ABS_RY":
                 servoRange = self.servoRange[event.code]
                 event.state = int((event.state * -1 + 32767) / (32767 + 32768) * (servoRange[1] - servoRange[0]))
-            else:
+            elif event.code == "ABS_X" or event.code == "ABS_RX":
                 servoRange = self.servoRange[event.code]
                 event.state = int((event.state + 32767) / (32767 + 32768) * (servoRange[1] - servoRange[0]))
 
