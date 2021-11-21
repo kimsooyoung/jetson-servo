@@ -46,8 +46,10 @@ class JoySerialSenderTwoBytes(object):
     def rotateServo(self):
         print(self.joyDict)
         
-        self._kit.servo[0].angle = self.joyDict['ABS_Y']
-        self._kit.servo[1].angle = self.joyDict['ABS_X']
+        self._kit.servo[0].angle = self.joyDict['ABS_X']
+        self._kit.servo[1].angle = self.joyDict['ABS_Y']
+        self._kit.servo[2].angle = self.joyDict['ABS_RX']
+        self._kit.servo[3].angle = self.joyDict['ABS_RY']
 
     def joyLoop(self):
         events = inputs.get_gamepad()

@@ -3,8 +3,9 @@ import board
 import busio
 import time
 
+kit = None
 
-def run():
+def setup():
     # On the Jetson Nano
     # Bus 0 (pins 28,27) is board SCL_1, SDA_1 in the jetson board definition file
     # Bus 1 (pins 5, 3) is board SCL, SDA in the jetson definition file
@@ -18,6 +19,11 @@ def run():
     kit = ServoKit(channels=16, i2c=i2c_bus0)
 
     print("Done initializing")
+
+
+def run():
+    global kit
+
     sweep = range(0,180)
     for degree in sweep:
         kit.servo[0].angle=degree
@@ -32,5 +38,8 @@ def run():
         time.sleep(0.01)
 
 if __name__=="__main__":
+
+    setup()
+
     while True: 
         run()
